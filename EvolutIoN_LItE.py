@@ -2049,7 +2049,42 @@ def main():
             'resource_scarcity': 1.0,
             'topological_entropy_decay': 0.05,
             'semantic_threshold': 0.0,
-            'computational_temp': 1.0
+            'computational_temp': 1.0,
+            'information_bottleneck_width': 0.0,
+            'integrated_information_target': 0.0,
+            'causal_emergence_bias': 0.0,
+            'algorithmic_cooling_rate': 0.0,
+            'sophistication_incentive': 0.0,
+            'kolmogorov_structure_function_slope': 0.0,
+            'bennett_depth_premium': 0.0,
+            'decoherence_resistance_factor': 0.0,
+            'jarzynski_equality_adherence': 0.0,
+            'non_equilibrium_steady_state_drive': 0.0,
+            'dissipation_cost_function': 0.0,
+            'many_worlds_branching_factor': 0.0,
+            'erasure_cost_scaling': 0.0,
+            'turing_pattern_wavelength': 0.0,
+            'homeobox_gene_expression_level': 0.0,
+            'cellular_automata_rule_space': 0.0,
+            'allosteric_regulation_factor': 0.0,
+            'phenotypic_plasticity_cost': 0.0,
+            'developmental_noise_injection': 0.0,
+            'gastrulation_event_trigger': 0.0,
+            'symbiotic_dependency_factor': 0.0,
+            'mimicry_selection_pressure': 0.0,
+            'character_displacement_force': 0.0,
+            'trophic_level_energy_transfer': 0.0,
+            'invasive_species_introduction_prob': 0.0,
+            'lyapunov_exponent_target': 0.0,
+            'frustration_index_minimization': 0.0,
+            'chimera_state_inducement': 0.0,
+            'network_motifs_overrepresentation': 0.0,
+            'synchronization_propensity': 0.0,
+            'transposon_activity_rate': 0.0,
+            'intron_splicing_variability': 0.0,
+            'polyploidy_event_prob': 0.0,
+            'telomere_shortening_rate': 0.0,
+            'wolbachia_infection_effect': 0.0,
         }
         st.session_state.settings = optimal_defaults
         st.toast("Parameters reset to optimal defaults!", icon="⚙️")
@@ -2448,6 +2483,224 @@ def main():
             key="computational_temp_slider"
         )
 
+        st.markdown("---")
+        st.markdown("###### Information & Complexity Theoretic (Disabled)")
+        information_bottleneck_width = st.slider(
+            "Information Bottleneck Width", 0.0, 1.0, s.get('information_bottleneck_width', 0.0), 0.05,
+            help="Controls the tightness of an information bottleneck applied during development.",
+            key="information_bottleneck_width_slider",
+            disabled=True
+        )
+        integrated_information_target = st.slider(
+            "Integrated Information Target (Φ)", 0.0, 1.0, s.get('integrated_information_target', 0.0), 0.05,
+            help="A target for Integrated Information Theory (IIT) Phi, rewarding consciousness-like structures.",
+            key="integrated_information_target_slider",
+            disabled=True
+        )
+        causal_emergence_bias = st.slider(
+            "Causal Emergence Bias", 0.0, 1.0, s.get('causal_emergence_bias', 0.0), 0.05,
+            help="Bias towards architectures that exhibit strong causal emergence at macro-scales.",
+            key="causal_emergence_bias_slider",
+            disabled=True
+        )
+        algorithmic_cooling_rate = st.slider(
+            "Algorithmic Cooling Rate", 0.0, 1.0, s.get('algorithmic_cooling_rate', 0.0), 0.05,
+            help="Rate at which the 'algorithmic temperature' (complexity penalty) is annealed over generations.",
+            key="algorithmic_cooling_rate_slider",
+            disabled=True
+        )
+        sophistication_incentive = st.slider(
+            "Sophistication Incentive", 0.0, 1.0, s.get('sophistication_incentive', 0.0), 0.05,
+            help="Reward for high 'sophistication' (a measure of complex, non-random structure).",
+            key="sophistication_incentive_slider",
+            disabled=True
+        )
+        kolmogorov_structure_function_slope = st.slider(
+            "Kolmogorov Structure Function Slope", 0.0, 1.0, s.get('kolmogorov_structure_function_slope', 0.0), 0.05,
+            help="A penalty based on the slope of the Kolmogorov Structure Function, penalizing trivial complexity.",
+            key="kolmogorov_structure_function_slope_slider",
+            disabled=True
+        )
+        bennett_depth_premium = st.slider(
+            "Bennett Depth Premium", 0.0, 1.0, s.get('bennett_depth_premium', 0.0), 0.05,
+            help="A fitness premium for architectures with high logical/computational depth.",
+            key="bennett_depth_premium_slider",
+            disabled=True
+        )
+        st.markdown("###### Quantum & Thermodynamic (Disabled)")
+        decoherence_resistance_factor = st.slider(
+            "Decoherence Resistance Factor", 0.0, 1.0, s.get('decoherence_resistance_factor', 0.0), 0.05,
+            help="A fitness bonus for architectures whose simulated dynamics show resistance to noise-induced decoherence.",
+            key="decoherence_resistance_factor_slider",
+            disabled=True
+        )
+        jarzynski_equality_adherence = st.slider(
+            "Jarzynski Equality Adherence", 0.0, 1.0, s.get('jarzynski_equality_adherence', 0.0), 0.05,
+            help="A measure of how well the developmental process adheres to the Jarzynski equality, rewarding thermodynamic efficiency.",
+            key="jarzynski_equality_adherence_slider",
+            disabled=True
+        )
+        non_equilibrium_steady_state_drive = st.slider(
+            "Non-Equilibrium Steady State Drive", 0.0, 1.0, s.get('non_equilibrium_steady_state_drive', 0.0), 0.05,
+            help="A drive towards maintaining a non-equilibrium steady state (NESS), a hallmark of living systems.",
+            key="non_equilibrium_steady_state_drive_slider",
+            disabled=True
+        )
+        dissipation_cost_function = st.slider(
+            "Dissipation Cost Function", 0.0, 1.0, s.get('dissipation_cost_function', 0.0), 0.05,
+            help="A penalty based on the estimated heat dissipation of the network's computation.",
+            key="dissipation_cost_function_slider",
+            disabled=True
+        )
+        many_worlds_branching_factor = st.slider(
+            "Many-Worlds Branching Factor", 0.0, 1.0, s.get('many_worlds_branching_factor', 0.0), 0.05,
+            help="In a simulated multiverse selection, how many 'worlds' a successful genotype can branch into.",
+            key="many_worlds_branching_factor_slider",
+            disabled=True
+        )
+        erasure_cost_scaling = st.slider(
+            "Erasure Cost Scaling", 0.0, 1.0, s.get('erasure_cost_scaling', 0.0), 0.05,
+            help="How strongly the Landauer cost scales with the number of bit erasures.",
+            key="erasure_cost_scaling_slider",
+            disabled=True
+        )
+        st.markdown("###### Developmental & Morphogenetic (Disabled)")
+        turing_pattern_wavelength = st.slider(
+            "Turing Pattern Wavelength", 0.0, 1.0, s.get('turing_pattern_wavelength', 0.0), 0.05,
+            help="Controls the characteristic wavelength of Turing patterns in the morphogenetic field, influencing module spacing.",
+            key="turing_pattern_wavelength_slider",
+            disabled=True
+        )
+        homeobox_gene_expression_level = st.slider(
+            "Homeobox Gene Expression Level", 0.0, 1.0, s.get('homeobox_gene_expression_level', 0.0), 0.05,
+            help="Simulates the influence of master control genes (Hox genes) on body plan segmentation and identity.",
+            key="homeobox_gene_expression_level_slider",
+            disabled=True
+        )
+        cellular_automata_rule_space = st.slider(
+            "Cellular Automata Rule Space", 0.0, 1.0, s.get('cellular_automata_rule_space', 0.0), 0.05,
+            help="The complexity of the cellular automata rule set used for developmental growth.",
+            key="cellular_automata_rule_space_slider",
+            disabled=True
+        )
+        allosteric_regulation_factor = st.slider(
+            "Allosteric Regulation Factor", 0.0, 1.0, s.get('allosteric_regulation_factor', 0.0), 0.05,
+            help="Simulates allosteric effects in the Gene Regulatory Network, allowing for complex, non-linear gene interactions.",
+            key="allosteric_regulation_factor_slider",
+            disabled=True
+        )
+        phenotypic_plasticity_cost = st.slider(
+            "Phenotypic Plasticity Cost", 0.0, 1.0, s.get('phenotypic_plasticity_cost', 0.0), 0.05,
+            help="A metabolic cost associated with high levels of phenotypic plasticity (Baldwin effect).",
+            key="phenotypic_plasticity_cost_slider",
+            disabled=True
+        )
+        developmental_noise_injection = st.slider(
+            "Developmental Noise Injection", 0.0, 1.0, s.get('developmental_noise_injection', 0.0), 0.05,
+            help="Amount of noise injected into the developmental process to test for canalization.",
+            key="developmental_noise_injection_slider",
+            disabled=True
+        )
+        gastrulation_event_trigger = st.slider(
+            "Gastrulation Event Trigger", 0.0, 1.0, s.get('gastrulation_event_trigger', 0.0), 0.05,
+            help="A fitness threshold that triggers a simulated gastrulation-like event, leading to radical reorganization.",
+            key="gastrulation_event_trigger_slider",
+            disabled=True
+        )
+        st.markdown("###### Ecosystem & Coevolutionary (Disabled)")
+        symbiotic_dependency_factor = st.slider(
+            "Symbiotic Dependency Factor", 0.0, 1.0, s.get('symbiotic_dependency_factor', 0.0), 0.05,
+            help="How strongly two symbiotic species rely on each other for fitness.",
+            key="symbiotic_dependency_factor_slider",
+            disabled=True
+        )
+        mimicry_selection_pressure = st.slider(
+            "Mimicry Selection Pressure", 0.0, 1.0, s.get('mimicry_selection_pressure', 0.0), 0.05,
+            help="A pressure for one species to mimic the phenotypic traits of another (Batesian or Müllerian mimicry).",
+            key="mimicry_selection_pressure_slider",
+            disabled=True
+        )
+        character_displacement_force = st.slider(
+            "Character Displacement Force", 0.0, 1.0, s.get('character_displacement_force', 0.0), 0.05,
+            help="A force that drives competing species to diverge in their traits to reduce niche overlap.",
+            key="character_displacement_force_slider",
+            disabled=True
+        )
+        trophic_level_energy_transfer = st.slider(
+            "Trophic Level Energy Transfer", 0.0, 1.0, s.get('trophic_level_energy_transfer', 0.0), 0.05,
+            help="The efficiency of 'fitness' transfer between predator and prey species in a simulated food web.",
+            key="trophic_level_energy_transfer_slider",
+            disabled=True
+        )
+        invasive_species_introduction_prob = st.slider(
+            "Invasive Species Introduction Prob", 0.0, 1.0, s.get('invasive_species_introduction_prob', 0.0), 0.05,
+            help="Probability of introducing a highly divergent, pre-evolved 'invasive' species from an external archive.",
+            key="invasive_species_introduction_prob_slider",
+            disabled=True
+        )
+        st.markdown("###### Network & Dynamical Systems (Disabled)")
+        lyapunov_exponent_target = st.slider(
+            "Lyapunov Exponent Target", 0.0, 1.0, s.get('lyapunov_exponent_target', 0.0), 0.05,
+            help="A target for the network's largest Lyapunov exponent, tuning it towards stable, chaotic, or periodic dynamics.",
+            key="lyapunov_exponent_target_slider",
+            disabled=True
+        )
+        frustration_index_minimization = st.slider(
+            "Frustration Index Minimization", 0.0, 1.0, s.get('frustration_index_minimization', 0.0), 0.05,
+            help="A drive to minimize 'frustration' in networks with mixed excitatory/inhibitory connections (from spin-glass physics).",
+            key="frustration_index_minimization_slider",
+            disabled=True
+        )
+        chimera_state_inducement = st.slider(
+            "Chimera State Inducement", 0.0, 1.0, s.get('chimera_state_inducement', 0.0), 0.05,
+            help="A bonus for architectures that can support 'chimera states' (coexisting coherent and incoherent parts).",
+            key="chimera_state_inducement_slider",
+            disabled=True
+        )
+        network_motifs_overrepresentation = st.slider(
+            "Network Motifs Overrepresentation", 0.0, 1.0, s.get('network_motifs_overrepresentation', 0.0), 0.05,
+            help="A bias to reward the over-representation of specific 3-node network motifs (e.g., feed-forward loops).",
+            key="network_motifs_overrepresentation_slider",
+            disabled=True
+        )
+        synchronization_propensity = st.slider(
+            "Synchronization Propensity", 0.0, 1.0, s.get('synchronization_propensity', 0.0), 0.05,
+            help="A measure of the architecture's tendency to fall into global synchronization, which can be rewarded or penalized.",
+            key="synchronization_propensity_slider",
+            disabled=True
+        )
+        st.markdown("###### Advanced Genetic Operators (Disabled)")
+        transposon_activity_rate = st.slider(
+            "Transposon Activity Rate", 0.0, 1.0, s.get('transposon_activity_rate', 0.0), 0.05,
+            help="Rate of 'jumping genes' (transposons) that can copy/move sections of the genotype, causing major rearrangements.",
+            key="transposon_activity_rate_slider",
+            disabled=True
+        )
+        intron_splicing_variability = st.slider(
+            "Intron Splicing Variability", 0.0, 1.0, s.get('intron_splicing_variability', 0.0), 0.05,
+            help="The degree of variability in how non-coding 'intron' regions are spliced, allowing one gene to produce multiple proteins (phenotypes).",
+            key="intron_splicing_variability_slider",
+            disabled=True
+        )
+        polyploidy_event_prob = st.slider(
+            "Polyploidy Event Prob", 0.0, 1.0, s.get('polyploidy_event_prob', 0.0), 0.05,
+            help="Probability of a whole-genome duplication event, leading to massive redundancy and potential for neofunctionalization.",
+            key="polyploidy_event_prob_slider",
+            disabled=True
+        )
+        telomere_shortening_rate = st.slider(
+            "Telomere Shortening Rate", 0.0, 1.0, s.get('telomere_shortening_rate', 0.0), 0.05,
+            help="A simulated aging mechanism where 'telomeres' on the genotype shorten with each replication, limiting lineage lifespan.",
+            key="telomere_shortening_rate_slider",
+            disabled=True
+        )
+        wolbachia_infection_effect = st.slider(
+            "Wolbachia Infection Effect", 0.0, 1.0, s.get('wolbachia_infection_effect', 0.0), 0.05,
+            help="Simulates a parasitic infection that manipulates reproduction, e.g., forcing asexual reproduction or killing males.",
+            key="wolbachia_infection_effect_slider",
+            disabled=True
+        )
+
     st.sidebar.markdown("### Experiment Settings")
     num_generations = st.sidebar.slider(
         "Generations",
@@ -2519,7 +2772,42 @@ def main():
         'resource_scarcity': resource_scarcity,
         'topological_entropy_decay': topological_entropy_decay,
         'semantic_threshold': semantic_threshold,
-        'computational_temp': computational_temp
+        'computational_temp': computational_temp,
+        'information_bottleneck_width': information_bottleneck_width,
+        'integrated_information_target': integrated_information_target,
+        'causal_emergence_bias': causal_emergence_bias,
+        'algorithmic_cooling_rate': algorithmic_cooling_rate,
+        'sophistication_incentive': sophistication_incentive,
+        'kolmogorov_structure_function_slope': kolmogorov_structure_function_slope,
+        'bennett_depth_premium': bennett_depth_premium,
+        'decoherence_resistance_factor': decoherence_resistance_factor,
+        'jarzynski_equality_adherence': jarzynski_equality_adherence,
+        'non_equilibrium_steady_state_drive': non_equilibrium_steady_state_drive,
+        'dissipation_cost_function': dissipation_cost_function,
+        'many_worlds_branching_factor': many_worlds_branching_factor,
+        'erasure_cost_scaling': erasure_cost_scaling,
+        'turing_pattern_wavelength': turing_pattern_wavelength,
+        'homeobox_gene_expression_level': homeobox_gene_expression_level,
+        'cellular_automata_rule_space': cellular_automata_rule_space,
+        'allosteric_regulation_factor': allosteric_regulation_factor,
+        'phenotypic_plasticity_cost': phenotypic_plasticity_cost,
+        'developmental_noise_injection': developmental_noise_injection,
+        'gastrulation_event_trigger': gastrulation_event_trigger,
+        'symbiotic_dependency_factor': symbiotic_dependency_factor,
+        'mimicry_selection_pressure': mimicry_selection_pressure,
+        'character_displacement_force': character_displacement_force,
+        'trophic_level_energy_transfer': trophic_level_energy_transfer,
+        'invasive_species_introduction_prob': invasive_species_introduction_prob,
+        'lyapunov_exponent_target': lyapunov_exponent_target,
+        'frustration_index_minimization': frustration_index_minimization,
+        'chimera_state_inducement': chimera_state_inducement,
+        'network_motifs_overrepresentation': network_motifs_overrepresentation,
+        'synchronization_propensity': synchronization_propensity,
+        'transposon_activity_rate': transposon_activity_rate,
+        'intron_splicing_variability': intron_splicing_variability,
+        'polyploidy_event_prob': polyploidy_event_prob,
+        'telomere_shortening_rate': telomere_shortening_rate,
+        'wolbachia_infection_effect': wolbachia_infection_effect,
     }
     
     # Save settings to DB if they have changed
