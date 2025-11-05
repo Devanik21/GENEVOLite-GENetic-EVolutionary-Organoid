@@ -2034,7 +2034,22 @@ def main():
             'enable_speciation': True,
             'compatibility_threshold': 7.0,
             'num_generations': 100,
-            'complexity_level': 'medium'
+            'complexity_level': 'medium',
+            'aic_pressure': 0.0,
+            'fep_bias': 0.0,
+            'criticality_tuning': 0.5,
+            'landauer_adherence': 0.0,
+            'quantum_tunneling': 0.0,
+            'canalization_strength': 1.0,
+            'morphogenetic_gradient': 0.0,
+            'grn_plasticity': 0.0,
+            'somatic_hypermutation': 0.0,
+            'hgt_mobility': 0.0,
+            'symbiogenesis_threshold': 0.95,
+            'resource_scarcity': 1.0,
+            'topological_entropy_decay': 0.05,
+            'semantic_threshold': 0.0,
+            'computational_temp': 1.0
         }
         st.session_state.settings = optimal_defaults
         st.toast("Parameters reset to optimal defaults!", icon="⚙️")
@@ -2336,6 +2351,103 @@ def main():
         )
         st.info("Speciation uses a genomic distance metric based on form, module/connection differences, and parameter differences.")
 
+    with st.sidebar.expander("♾️ Deep Evolutionary Physics & Information Dynamics", expanded=False):
+        st.markdown("These parameters control the deep, underlying physics of the simulated universe, influencing information flow, developmental biology, and thermodynamic properties. **Warning:** These are highly experimental and can lead to unpredictable dynamics.")
+        
+        aic_pressure = st.slider(
+            "Algorithmic Information Pressure (Ω)", 0.0, 1.0, s.get('aic_pressure', 0.0), 0.05,
+            help="**Simulates Occam's Razor.** A selective pressure favoring genotypes with lower Kolmogorov complexity (i.e., more compressible, elegant solutions). A value of 1.0 would strongly penalize complexity.",
+            key="aic_pressure_slider"
+        )
+        
+        fep_bias = st.slider(
+            "Free Energy Principle Bias (β_FEP)", 0.0, 1.0, s.get('fep_bias', 0.0), 0.05,
+            help="**Models a drive for self-organization.** A bias favoring architectures structured to minimize their variational free energy (a concept from Karl Friston). This promotes models that are intrinsically good at predicting their inputs and minimizing surprise.",
+            key="fep_bias_slider"
+        )
+
+        criticality_tuning = st.slider(
+            "Criticality Hypothesis Tuning (σ_crit)", 0.0, 1.0, s.get('criticality_tuning', 0.5), 0.05,
+            help="**Tunes the system towards the 'edge of chaos'.** A parameter that rewards architectures whose network dynamics operate in a critical state (between order and chaos), which is theorized to maximize information processing and computational power.",
+            key="criticality_tuning_slider"
+        )
+
+        landauer_adherence = st.slider(
+            "Landauer's Limit Adherence (L_ad)", 0.0, 1.0, s.get('landauer_adherence', 0.0), 0.05,
+            help="**A penalty for thermodynamic inefficiency.** Based on Landauer's principle, this penalizes architectures for every irreversible computation (bit erasure) they perform, favoring reversible and energy-efficient designs.",
+            key="landauer_adherence_slider"
+        )
+
+        quantum_tunneling = st.slider(
+            "Quantum Annealing Tunneling (ħ_tunnel)", 0.0, 0.1, s.get('quantum_tunneling', 0.0), 0.005,
+            help="**Simulates a quantum mechanism for escaping local optima.** A non-zero value allows genotypes to 'tunnel' through fitness barriers to adjacent, but otherwise unreachable, points in the genotype space during selection.",
+            key="quantum_tunneling_slider"
+        )
+
+        st.markdown("---")
+
+        canalization_strength = st.slider(
+            "Developmental Canalization (κ)", 0.0, 5.0, s.get('canalization_strength', 1.0), 0.1,
+            help="**Models developmental robustness.** How strongly the developmental process (genotype-to-phenotype mapping) resists perturbations from mutations or environmental noise. High values lead to very stable phenotypes.",
+            key="canalization_strength_slider"
+        )
+
+        morphogenetic_gradient = st.slider(
+            "Morphogenetic Field Gradient (∇Φ)", 0.0, 1.0, s.get('morphogenetic_gradient', 0.0), 0.05,
+            help="**Controls spatial organization during development.** The strength of a simulated spatial chemical gradient that influences module placement, differentiation, and connectivity, creating body plans.",
+            key="morphogenetic_gradient_slider"
+        )
+
+        grn_plasticity = st.slider(
+            "Gene Regulatory Network Plasticity (γ_GRN)", 0.0, 0.1, s.get('grn_plasticity', 0.0), 0.001,
+            help="**Enables meta-evolution.** The degree to which the 'rules' of evolution themselves (e.g., mutation rates, developmental rules) can evolve. A non-zero value allows the evolutionary process itself to adapt.",
+            key="grn_plasticity_slider"
+        )
+
+        somatic_hypermutation = st.slider(
+            "Somatic Hypermutation Rate (μ_soma)", 0.0, 0.05, s.get('somatic_hypermutation', 0.0), 0.001,
+            help="**Simulates lifetime adaptation, like the immune system.** A rate of mutation that occurs *within* an individual's lifetime on specific 'plastic' modules, allowing for rapid, targeted adaptation without changing the germline DNA.",
+            key="somatic_hypermutation_slider"
+        )
+
+        st.markdown("---")
+
+        hgt_mobility = st.slider(
+            "HGT Vector Mobility (ν_HGT)", 0.0, 0.01, s.get('hgt_mobility', 0.0), 0.0005,
+            help="**Models extreme horizontal gene transfer.** The probability that a successful genetic module can be transferred between *unrelated* species (different Forms), enabling massive, non-linear evolutionary leaps.",
+            key="hgt_mobility_slider"
+        )
+
+        symbiogenesis_threshold = st.slider(
+            "Symbiogenesis Trigger (τ_sym)", 0.5, 1.0, s.get('symbiogenesis_threshold', 0.95), 0.01,
+            help="**A fitness threshold for species fusion.** When two distinct species both cross this high fitness threshold, it dramatically increases the probability of a symbiogenesis (endosymbiosis) event between them.",
+            key="symbiogenesis_threshold_slider"
+        )
+
+        resource_scarcity = st.slider(
+            "Resource Scarcity Factor (ρ_res)", 0.5, 3.0, s.get('resource_scarcity', 1.0), 0.1,
+            help="**Simulates ecosystem-wide resource limits.** A global multiplier on the 'cost' of parameters and connections. High scarcity heavily penalizes large models, forcing the entire ecosystem towards efficiency.",
+            key="resource_scarcity_slider"
+        )
+
+        topological_entropy_decay = st.slider(
+            "Topological Entropy Decay (λ_top)", 0.0, 0.5, s.get('topological_entropy_decay', 0.05), 0.01,
+            help="**Controls diversity of network motifs.** The rate at which the diversity of local connection patterns is encouraged to decay. High decay forces the system to settle on a few proven motifs; low decay encourages exploration of new ones.",
+            key="topological_entropy_decay_slider"
+        )
+
+        semantic_threshold = st.slider(
+            "Semantic Information Threshold (I(X;Y))", 0.0, 0.5, s.get('semantic_threshold', 0.0), 0.01,
+            help="**Enforces meaningful complexity.** A minimum threshold of mutual information between an architecture's structural properties and its performance. Penalizes 'complex for nothing' architectures where structure is uncorrelated with function.",
+            key="semantic_threshold_slider"
+        )
+
+        computational_temp = st.slider(
+            "Computational Temperature (T_comp)", 0.0, 2.0, s.get('computational_temp', 1.0), 0.05,
+            help="**Noise in the genotype-phenotype map.** Analogous to thermodynamic temperature, this controls the stochasticity of the developmental process. High temperature leads to more variable and noisy phenotypic expression for the same genotype.",
+            key="computational_temp_slider"
+        )
+
     st.sidebar.markdown("### Experiment Settings")
     num_generations = st.sidebar.slider(
         "Generations",
@@ -2392,7 +2504,22 @@ def main():
         'diversity_weight': diversity_weight,
         'compatibility_threshold': compatibility_threshold,
         'num_generations': num_generations,
-        'complexity_level': complexity_level
+        'complexity_level': complexity_level,
+        'aic_pressure': aic_pressure,
+        'fep_bias': fep_bias,
+        'criticality_tuning': criticality_tuning,
+        'landauer_adherence': landauer_adherence,
+        'quantum_tunneling': quantum_tunneling,
+        'canalization_strength': canalization_strength,
+        'morphogenetic_gradient': morphogenetic_gradient,
+        'grn_plasticity': grn_plasticity,
+        'somatic_hypermutation': somatic_hypermutation,
+        'hgt_mobility': hgt_mobility,
+        'symbiogenesis_threshold': symbiogenesis_threshold,
+        'resource_scarcity': resource_scarcity,
+        'topological_entropy_decay': topological_entropy_decay,
+        'semantic_threshold': semantic_threshold,
+        'computational_temp': computational_temp
     }
     
     # Save settings to DB if they have changed
