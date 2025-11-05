@@ -2085,6 +2085,7 @@ def main():
             'polyploidy_event_prob': 0.0,
             'telomere_shortening_rate': 0.0,
             'wolbachia_infection_effect': 0.0,
+            'deep_physics_enabled': False,
         }
         st.session_state.settings = optimal_defaults
         st.toast("Parameters reset to optimal defaults!", icon="⚙️")
@@ -2484,221 +2485,230 @@ def main():
         )
 
         st.markdown("---")
-        st.markdown("###### Information & Complexity Theoretic (Disabled)")
+        deep_physics_enabled = st.checkbox(
+            "☢️ Enable All Experimental Parameters Below",
+            value=s.get('deep_physics_enabled', False),
+            key="deep_physics_enabled_cb",
+            help="**WARNING:** Enabling these parameters can drastically alter evolutionary dynamics, lead to unpredictable behavior, and significantly slow down the simulation. Use with extreme caution."
+        )
+        if deep_physics_enabled:
+            st.warning("**Experimental Parameters Enabled!** The simulation will now incorporate highly complex and potentially unstable dynamics. Monitor results closely.")
+
+        st.markdown("###### Information & Complexity Theoretic")
         information_bottleneck_width = st.slider(
             "Information Bottleneck Width", 0.0, 1.0, s.get('information_bottleneck_width', 0.0), 0.05,
             help="Controls the tightness of an information bottleneck applied during development.",
             key="information_bottleneck_width_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         integrated_information_target = st.slider(
             "Integrated Information Target (Φ)", 0.0, 1.0, s.get('integrated_information_target', 0.0), 0.05,
             help="A target for Integrated Information Theory (IIT) Phi, rewarding consciousness-like structures.",
             key="integrated_information_target_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         causal_emergence_bias = st.slider(
             "Causal Emergence Bias", 0.0, 1.0, s.get('causal_emergence_bias', 0.0), 0.05,
             help="Bias towards architectures that exhibit strong causal emergence at macro-scales.",
             key="causal_emergence_bias_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         algorithmic_cooling_rate = st.slider(
             "Algorithmic Cooling Rate", 0.0, 1.0, s.get('algorithmic_cooling_rate', 0.0), 0.05,
             help="Rate at which the 'algorithmic temperature' (complexity penalty) is annealed over generations.",
             key="algorithmic_cooling_rate_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         sophistication_incentive = st.slider(
             "Sophistication Incentive", 0.0, 1.0, s.get('sophistication_incentive', 0.0), 0.05,
             help="Reward for high 'sophistication' (a measure of complex, non-random structure).",
             key="sophistication_incentive_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         kolmogorov_structure_function_slope = st.slider(
             "Kolmogorov Structure Function Slope", 0.0, 1.0, s.get('kolmogorov_structure_function_slope', 0.0), 0.05,
             help="A penalty based on the slope of the Kolmogorov Structure Function, penalizing trivial complexity.",
             key="kolmogorov_structure_function_slope_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         bennett_depth_premium = st.slider(
             "Bennett Depth Premium", 0.0, 1.0, s.get('bennett_depth_premium', 0.0), 0.05,
             help="A fitness premium for architectures with high logical/computational depth.",
             key="bennett_depth_premium_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
-        st.markdown("###### Quantum & Thermodynamic (Disabled)")
+        st.markdown("###### Quantum & Thermodynamic")
         decoherence_resistance_factor = st.slider(
             "Decoherence Resistance Factor", 0.0, 1.0, s.get('decoherence_resistance_factor', 0.0), 0.05,
             help="A fitness bonus for architectures whose simulated dynamics show resistance to noise-induced decoherence.",
             key="decoherence_resistance_factor_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         jarzynski_equality_adherence = st.slider(
             "Jarzynski Equality Adherence", 0.0, 1.0, s.get('jarzynski_equality_adherence', 0.0), 0.05,
             help="A measure of how well the developmental process adheres to the Jarzynski equality, rewarding thermodynamic efficiency.",
             key="jarzynski_equality_adherence_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         non_equilibrium_steady_state_drive = st.slider(
             "Non-Equilibrium Steady State Drive", 0.0, 1.0, s.get('non_equilibrium_steady_state_drive', 0.0), 0.05,
             help="A drive towards maintaining a non-equilibrium steady state (NESS), a hallmark of living systems.",
             key="non_equilibrium_steady_state_drive_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         dissipation_cost_function = st.slider(
             "Dissipation Cost Function", 0.0, 1.0, s.get('dissipation_cost_function', 0.0), 0.05,
             help="A penalty based on the estimated heat dissipation of the network's computation.",
             key="dissipation_cost_function_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         many_worlds_branching_factor = st.slider(
             "Many-Worlds Branching Factor", 0.0, 1.0, s.get('many_worlds_branching_factor', 0.0), 0.05,
             help="In a simulated multiverse selection, how many 'worlds' a successful genotype can branch into.",
             key="many_worlds_branching_factor_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         erasure_cost_scaling = st.slider(
             "Erasure Cost Scaling", 0.0, 1.0, s.get('erasure_cost_scaling', 0.0), 0.05,
             help="How strongly the Landauer cost scales with the number of bit erasures.",
             key="erasure_cost_scaling_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
-        st.markdown("###### Developmental & Morphogenetic (Disabled)")
+        st.markdown("###### Developmental & Morphogenetic")
         turing_pattern_wavelength = st.slider(
             "Turing Pattern Wavelength", 0.0, 1.0, s.get('turing_pattern_wavelength', 0.0), 0.05,
             help="Controls the characteristic wavelength of Turing patterns in the morphogenetic field, influencing module spacing.",
             key="turing_pattern_wavelength_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         homeobox_gene_expression_level = st.slider(
             "Homeobox Gene Expression Level", 0.0, 1.0, s.get('homeobox_gene_expression_level', 0.0), 0.05,
             help="Simulates the influence of master control genes (Hox genes) on body plan segmentation and identity.",
             key="homeobox_gene_expression_level_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         cellular_automata_rule_space = st.slider(
             "Cellular Automata Rule Space", 0.0, 1.0, s.get('cellular_automata_rule_space', 0.0), 0.05,
             help="The complexity of the cellular automata rule set used for developmental growth.",
             key="cellular_automata_rule_space_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         allosteric_regulation_factor = st.slider(
             "Allosteric Regulation Factor", 0.0, 1.0, s.get('allosteric_regulation_factor', 0.0), 0.05,
             help="Simulates allosteric effects in the Gene Regulatory Network, allowing for complex, non-linear gene interactions.",
             key="allosteric_regulation_factor_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         phenotypic_plasticity_cost = st.slider(
             "Phenotypic Plasticity Cost", 0.0, 1.0, s.get('phenotypic_plasticity_cost', 0.0), 0.05,
             help="A metabolic cost associated with high levels of phenotypic plasticity (Baldwin effect).",
             key="phenotypic_plasticity_cost_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         developmental_noise_injection = st.slider(
             "Developmental Noise Injection", 0.0, 1.0, s.get('developmental_noise_injection', 0.0), 0.05,
             help="Amount of noise injected into the developmental process to test for canalization.",
             key="developmental_noise_injection_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         gastrulation_event_trigger = st.slider(
             "Gastrulation Event Trigger", 0.0, 1.0, s.get('gastrulation_event_trigger', 0.0), 0.05,
             help="A fitness threshold that triggers a simulated gastrulation-like event, leading to radical reorganization.",
             key="gastrulation_event_trigger_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
-        st.markdown("###### Ecosystem & Coevolutionary (Disabled)")
+        st.markdown("###### Ecosystem & Coevolutionary")
         symbiotic_dependency_factor = st.slider(
             "Symbiotic Dependency Factor", 0.0, 1.0, s.get('symbiotic_dependency_factor', 0.0), 0.05,
             help="How strongly two symbiotic species rely on each other for fitness.",
             key="symbiotic_dependency_factor_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         mimicry_selection_pressure = st.slider(
             "Mimicry Selection Pressure", 0.0, 1.0, s.get('mimicry_selection_pressure', 0.0), 0.05,
             help="A pressure for one species to mimic the phenotypic traits of another (Batesian or Müllerian mimicry).",
             key="mimicry_selection_pressure_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         character_displacement_force = st.slider(
             "Character Displacement Force", 0.0, 1.0, s.get('character_displacement_force', 0.0), 0.05,
             help="A force that drives competing species to diverge in their traits to reduce niche overlap.",
             key="character_displacement_force_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         trophic_level_energy_transfer = st.slider(
             "Trophic Level Energy Transfer", 0.0, 1.0, s.get('trophic_level_energy_transfer', 0.0), 0.05,
             help="The efficiency of 'fitness' transfer between predator and prey species in a simulated food web.",
             key="trophic_level_energy_transfer_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         invasive_species_introduction_prob = st.slider(
             "Invasive Species Introduction Prob", 0.0, 1.0, s.get('invasive_species_introduction_prob', 0.0), 0.05,
             help="Probability of introducing a highly divergent, pre-evolved 'invasive' species from an external archive.",
             key="invasive_species_introduction_prob_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
-        st.markdown("###### Network & Dynamical Systems (Disabled)")
+        st.markdown("###### Network & Dynamical Systems")
         lyapunov_exponent_target = st.slider(
             "Lyapunov Exponent Target", 0.0, 1.0, s.get('lyapunov_exponent_target', 0.0), 0.05,
             help="A target for the network's largest Lyapunov exponent, tuning it towards stable, chaotic, or periodic dynamics.",
             key="lyapunov_exponent_target_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         frustration_index_minimization = st.slider(
             "Frustration Index Minimization", 0.0, 1.0, s.get('frustration_index_minimization', 0.0), 0.05,
             help="A drive to minimize 'frustration' in networks with mixed excitatory/inhibitory connections (from spin-glass physics).",
             key="frustration_index_minimization_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         chimera_state_inducement = st.slider(
             "Chimera State Inducement", 0.0, 1.0, s.get('chimera_state_inducement', 0.0), 0.05,
             help="A bonus for architectures that can support 'chimera states' (coexisting coherent and incoherent parts).",
             key="chimera_state_inducement_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         network_motifs_overrepresentation = st.slider(
             "Network Motifs Overrepresentation", 0.0, 1.0, s.get('network_motifs_overrepresentation', 0.0), 0.05,
             help="A bias to reward the over-representation of specific 3-node network motifs (e.g., feed-forward loops).",
             key="network_motifs_overrepresentation_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         synchronization_propensity = st.slider(
             "Synchronization Propensity", 0.0, 1.0, s.get('synchronization_propensity', 0.0), 0.05,
             help="A measure of the architecture's tendency to fall into global synchronization, which can be rewarded or penalized.",
             key="synchronization_propensity_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
-        st.markdown("###### Advanced Genetic Operators (Disabled)")
+        st.markdown("###### Advanced Genetic Operators")
         transposon_activity_rate = st.slider(
             "Transposon Activity Rate", 0.0, 1.0, s.get('transposon_activity_rate', 0.0), 0.05,
             help="Rate of 'jumping genes' (transposons) that can copy/move sections of the genotype, causing major rearrangements.",
             key="transposon_activity_rate_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         intron_splicing_variability = st.slider(
             "Intron Splicing Variability", 0.0, 1.0, s.get('intron_splicing_variability', 0.0), 0.05,
             help="The degree of variability in how non-coding 'intron' regions are spliced, allowing one gene to produce multiple proteins (phenotypes).",
             key="intron_splicing_variability_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         polyploidy_event_prob = st.slider(
             "Polyploidy Event Prob", 0.0, 1.0, s.get('polyploidy_event_prob', 0.0), 0.05,
             help="Probability of a whole-genome duplication event, leading to massive redundancy and potential for neofunctionalization.",
             key="polyploidy_event_prob_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         telomere_shortening_rate = st.slider(
             "Telomere Shortening Rate", 0.0, 1.0, s.get('telomere_shortening_rate', 0.0), 0.05,
             help="A simulated aging mechanism where 'telomeres' on the genotype shorten with each replication, limiting lineage lifespan.",
             key="telomere_shortening_rate_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
         wolbachia_infection_effect = st.slider(
             "Wolbachia Infection Effect", 0.0, 1.0, s.get('wolbachia_infection_effect', 0.0), 0.05,
             help="Simulates a parasitic infection that manipulates reproduction, e.g., forcing asexual reproduction or killing males.",
             key="wolbachia_infection_effect_slider",
-            disabled=True
+            disabled=not deep_physics_enabled
         )
 
     st.sidebar.markdown("### Experiment Settings")
@@ -2773,6 +2783,7 @@ def main():
         'topological_entropy_decay': topological_entropy_decay,
         'semantic_threshold': semantic_threshold,
         'computational_temp': computational_temp,
+        'deep_physics_enabled': deep_physics_enabled,
         'information_bottleneck_width': information_bottleneck_width,
         'integrated_information_target': integrated_information_target,
         'causal_emergence_bias': causal_emergence_bias,
