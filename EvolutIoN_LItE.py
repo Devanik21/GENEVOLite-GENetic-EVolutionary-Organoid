@@ -1928,23 +1928,32 @@ def main():
 
     # --- Load previous state if available ---
     if 'state_loaded' not in st.session_state:
-        # Load settings
-        saved_settings = settings_table.get(doc_id=1)
-        st.session_state.settings = saved_settings if saved_settings else {}
-        
-        # Load results
-        saved_results = results_table.get(doc_id=1)
-        if saved_results:
-            st.session_state.history = saved_results.get('history', [])
-            st.session_state.evolutionary_metrics = saved_results.get('evolutionary_metrics', [])
+        try:
+            # Load settings
+            saved_settings = settings_table.get(doc_id=1)
+            st.session_state.settings = saved_settings if saved_settings else {}
             
-            # Deserialize population
-            pop_dicts = saved_results.get('current_population', [])
-            st.session_state.current_population = [dict_to_genotype(p) for p in pop_dicts] if pop_dicts else None
-            
-            st.toast("Loaded previous session data.", icon="💾")
-        else:
-            # Initialize if no saved data
+            # Load results
+            saved_results = results_table.get(doc_id=1)
+            if saved_results:
+                st.session_state.history = saved_results.get('history', [])
+                st.session_state.evolutionary_metrics = saved_results.get('evolutionary_metrics', [])
+                
+                # Deserialize population
+                pop_dicts = saved_results.get('current_population', [])
+                st.session_state.current_population = [dict_to_genotype(p) for p in pop_dicts] if pop_dicts else None
+                
+                st.toast("Loaded previous session data.", icon="💾")
+            else:
+                # Initialize if no saved data
+                st.session_state.history = []
+                st.session_state.evolutionary_metrics = []
+                st.session_state.current_population = None
+        except json.JSONDecodeError:
+            st.warning("⚠️ **Database Error:** Could not read the saved experiment state (`genevo_db.json`). The file may be corrupted.", icon="💾")
+            st.info("This can happen if multiple sessions write to the file at once. Starting a fresh session. To fix the file, please use the **'Clear Saved State & Reset'** button in the sidebar.")
+            # Initialize with empty state to allow the app to run
+            st.session_state.settings = {}
             st.session_state.history = []
             st.session_state.evolutionary_metrics = []
             st.session_state.current_population = None
