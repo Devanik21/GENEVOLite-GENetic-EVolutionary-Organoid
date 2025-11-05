@@ -843,9 +843,11 @@ def evaluate_fitness(genotype: Genotype, task_type: str, generation: int, weight
     # If a genotype has a trait targeted by the co-evolving parasite, its fitness is penalized.
     if parasite_profile:
         vulnerability_score = 0.0
-        for module in genotype.modules:
-            if module.module_type == parasite_profile['target_type'] and module.activation == parasite_profile['target_activation']:
-                vulnerability_score += 0.1 # Each matching module increases vulnerability
+        target_activation = parasite_profile.get('target_activation')
+        if target_activation:
+            for module in genotype.modules:
+                if module.activation == target_activation:
+                    vulnerability_score += 0.1 # Each matching module increases vulnerability
         
         total_fitness *= (1.0 - min(vulnerability_score, 0.5)) # Max 50% fitness reduction
 
@@ -2430,10 +2432,8 @@ def main():
         # For ecosystem dynamics
         st.session_state.cataclysm_recovery_mode = 0
         st.session_state.cataclysm_weights = None
-        st.session_state.parasite_profile = {
-            'target_type': 'attention',
-            'target_activation': 'gelu'
-        }
+        # The parasite now targets the most common activation function across all module types.
+        st.session_state.parasite_profile = {'target_activation': random.choice(['relu', 'gelu', 'silu', 'swish'])}
 
         # Progress tracking
         progress_container = st.empty()
@@ -2531,7 +2531,8 @@ def main():
                 col4.metric("Mutation Rate (μ)", f"{current_mutation_rate:.3f}")
                 # Placeholder for species count, will be updated below
                 if enable_red_queen:
-                    parasite_display.info(f"**Red Queen Active:** Parasite targeting `{st.session_state.parasite_profile['target_type']}` with `{st.session_state.parasite_profile['target_activation']}` activation.")
+                    target_act = st.session_state.parasite_profile.get('target_activation', 'N/A')
+                    parasite_display.info(f"**Red Queen Active:** Parasite targeting `{target_act}` activation function.")
                 else:
                     parasite_display.empty()
                 species_metric = col5.metric("Species Count", "N/A")
@@ -2626,9 +2627,9 @@ def main():
                 trait_counts = Counter()
                 for ind in survivors:
                     for module in ind.modules:
-                        trait_counts[(module.module_type, module.activation)] += 1
+                        trait_counts[module.activation] += 1
                 if trait_counts:
-                    st.session_state.parasite_profile['target_type'], st.session_state.parasite_profile['target_activation'] = trait_counts.most_common(1)[0][0]
+                    st.session_state.parasite_profile['target_activation'] = trait_counts.most_common(1)[0][0]
             
             # Reproduction
             offspring = []
