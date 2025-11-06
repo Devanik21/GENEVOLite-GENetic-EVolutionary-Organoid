@@ -2039,6 +2039,8 @@ def main():
             'random_seed': 42,
             'enable_early_stopping': True,
             'early_stopping_patience': 25,
+            'checkpoint_frequency': 50,
+            'analysis_top_n': 3,
             'aic_pressure': 0.0,
             'fep_bias': 0.0,
             'criticality_tuning': 0.5,
@@ -2784,6 +2786,18 @@ def main():
         help="Number of generations to wait for improvement before stopping.",
         key="early_stopping_patience_slider"
     )
+    checkpoint_frequency = st.sidebar.number_input(
+        "Checkpoint Frequency",
+        min_value=0, value=s.get('checkpoint_frequency', 50), step=5,
+        help="Save a checkpoint of the experiment state every N generations. 0 to disable. Checkpoints are saved to the same `genevo_db.json` file, overwriting the previous state.",
+        key="checkpoint_frequency_input"
+    )
+    analysis_top_n = st.sidebar.number_input(
+        "Top Architectures to Analyze",
+        min_value=1, max_value=20, value=s.get('analysis_top_n', 3), step=1,
+        help="Number of top-ranked architectures to display in the final analysis section.",
+        key="analysis_top_n_input"
+    )
     
     # --- Collect and save current settings ---
     current_settings = {
@@ -2826,6 +2840,8 @@ def main():
         'random_seed': random_seed,
         'enable_early_stopping': enable_early_stopping,
         'early_stopping_patience': early_stopping_patience,
+        'checkpoint_frequency': checkpoint_frequency,
+        'analysis_top_n': analysis_top_n,
         'aic_pressure': aic_pressure,
         'fep_bias': fep_bias,
         'criticality_tuning': criticality_tuning,
@@ -2893,7 +2909,10 @@ def main():
     st.sidebar.markdown("---")
     
     # Run evolution button
-    if st.sidebar.button("⚡ Initiate Evolution", type="primary", width='stretch', key="initiate_evolution_button"):
+    init_col, resume_col = st.sidebar.columns(2)
+
+    # --- INITIATE EVOLUTION ---
+    if init_col.button("⚡ Initiate Evolution", type="primary", width='stretch', key="initiate_evolution_button"):
         st.session_state.history = []
         st.session_state.evolutionary_metrics = [] # type: ignore
         st.session_state.gene_archive = [] # Initialize the infinite gene pool
@@ -3046,7 +3065,9 @@ def main():
                 'diversity': diversity,
                 'fisher_info': fisher_info,
                 'best_fitness': fitness_array.max(),
-                'mean_fitness': fitness_array.mean()
+                'mean_fitness': fitness_array.mean(),
+                'mutation_rate': current_mutation_rate,
+                'stagnation_counter': stagnation_counter
             })
             
             # Selection
@@ -3218,6 +3239,388 @@ def main():
 
             population = survivors + offspring
             
+            # --- Checkpointing ---
+            if checkpoint_frequency > 0 and (gen + 1) % checkpoint_frequency == 0 and (gen + 1) < num_generations:
+                serializable_population = [genotype_to_dict(p) for p in population]
+                results_to_save = {
+                    'history': st.session_state.history,
+                    'evolutionary_metrics': st.session_state.evolutionary_metrics,
+                    'current_population': serializable_population
+                }
+                if results_table.get(doc_id=1):
+                    results_table.update(results_to_save, doc_ids=[1])
+                else:
+                    results_table.insert(results_to_save)
+                st.toast(f"Checkpoint saved at generation {gen + 1}", icon="💾")
+
+            # Update progress
+            progress_container.progress((gen + 1) / num_generations)
+        
+        st.session_state.current_population = population
+        
+        # --- Save results to DB ---
+        serializable_population = [genotype_to_dict(p) for p in population]
+        
+        results_to_save = {
+            'history': st.session_state.history,
+            'evolutionary_metrics': st.session_state.evolutionary_metrics,
+            'current_population': serializable_population
+        }
+        if results_table.get(doc_id=1):
+            results_table.update(results_to_save, doc_ids=[1])
+        else:
+            results_table.insert(results_to_save)
+        
+        status_text.markdown("### ✅ Evolution Complete! Results saved.")
+
+    # --- RESUME EVOLUTION ---
+    if resume_col.button("🔄 Resume Evolution", width='stretch', key="resume_evolution_button"):
+        if not st.session_state.get('history') or not st.session_state.get('current_population'):
+            st.error("No previous experiment state found to resume. Please initiate a new evolution first.")
+            st.stop()
+
+        st.toast("Resuming previous evolution...", icon="🔄")
+
+        # --- Restore State ---
+        population = st.session_state.current_population
+        history_df = pd.DataFrame(st.session_state.history)
+        metrics_df = pd.DataFrame(st.session_state.evolutionary_metrics)
+
+        start_gen = history_df['generation'].max() + 1
+        
+        if start_gen >= num_generations:
+            st.warning("The previous evolution has already completed all generations. Please increase the number of generations to resume.")
+            st.stop()
+
+        # Restore counters and rates for adaptive schedules
+        last_best_fitness = metrics_df.iloc[-1]['best_fitness']
+        best_fitness_overall = metrics_df['best_fitness'].max()
+        current_mutation_rate = metrics_df.iloc[-1]['mutation_rate']
+        stagnation_counter = metrics_df.iloc[-1]['stagnation_counter']
+
+        # Recalculate early stopping counter
+        best_fitness_per_gen = history_df.groupby('generation')['fitness'].max()
+        best_fitness_overall_series = best_fitness_per_gen.cummax()
+        last_improvement_gen = best_fitness_overall_series[best_fitness_overall_series.diff() > 1e-6].index.max()
+        if pd.isna(last_improvement_gen):
+            last_improvement_gen = 0
+        early_stop_counter = (start_gen - 1) - last_improvement_gen
+
+        # Restore other state
+        current_task = task_type # Assume we continue with the currently selected task
+        if 'cataclysm_recovery_mode' not in st.session_state: st.session_state.cataclysm_recovery_mode = 0
+        if 'cataclysm_weights' not in st.session_state: st.session_state.cataclysm_weights = None
+        if 'parasite_profile' not in st.session_state: st.session_state.parasite_profile = {'target_activation': random.choice(['relu', 'gelu', 'silu', 'swish'])}
+
+        # --- Seeding for reproducibility ---
+        if random_seed != -1:
+            random.seed(random_seed)
+            np.random.seed(random_seed)
+            st.toast(f"Resuming with fixed random seed: {random_seed}", icon="🎲")
+        
+        # Progress tracking
+        progress_container = st.empty()
+        metrics_container = st.empty()
+        status_text = st.empty()
+        
+        # Evolution loop
+        for gen in range(start_gen, num_generations):
+            # --- Ecosystem Dynamics ---
+            active_fitness_weights = fitness_weights
+            
+            # Cataclysm Recovery
+            if st.session_state.cataclysm_recovery_mode > 0:
+                st.session_state.cataclysm_recovery_mode -= 1
+                active_fitness_weights = st.session_state.cataclysm_weights
+                if st.session_state.cataclysm_recovery_mode == 0:
+                    st.toast("🌍 Environmental pressures have normalized.", icon="✅")
+                    st.session_state.cataclysm_weights = None
+
+            # Cataclysm Trigger
+            elif enable_cataclysms and random.random() < cataclysm_probability:
+                event_type = random.choice(['extinction', 'collapse'])
+                if event_type == 'extinction' and len(population) > 10:
+                    st.warning(f"💥 Mass Extinction Event! A genetic bottleneck has occurred.")
+                    st.toast("💥 Mass Extinction!", icon="☄️")
+                    survivor_count = max(5, int(len(population) * 0.1))
+                    population = random.sample(population, k=survivor_count)
+                elif event_type == 'collapse':
+                    st.warning(f"📉 Environmental Collapse! Fitness objectives have drastically shifted.")
+                    st.toast("📉 Environmental Collapse!", icon="🌪️")
+                    st.session_state.cataclysm_recovery_mode = 5 # Lasts for 5 generations
+                    collapse_target = random.choice(list(fitness_weights.keys()))
+                    st.session_state.cataclysm_weights = {k: 0.05 for k in fitness_weights}
+                    st.session_state.cataclysm_weights[collapse_target] = 0.8
+                    active_fitness_weights = st.session_state.cataclysm_weights
+
+            # Red Queen Parasite Info
+            parasite_display = status_text.empty()
+
+            # Handle dynamic environment
+            if dynamic_environment and gen > 0 and gen % env_change_frequency == 0:
+                previous_task = current_task
+                current_task = random.choice([t for t in task_options if t != previous_task])
+                st.toast(f"🌍 Environment Shift! New Task: {current_task}", icon="🔄")
+                time.sleep(1.0)
+            
+            status_text.markdown(f"### 🧬 Generation {gen + 1}/{num_generations} | Task: **{current_task}**")
+            
+            # --- Apply developmental rules ---
+            # This simulates lifetime development like pruning and growth before evaluation
+            if enable_development:
+                for i in range(len(population)):
+                    population[i] = apply_developmental_rules(population[i], stagnation_counter)
+
+            # Evaluate fitness
+            all_scores = []
+            for individual in population:
+                # Pass the weights from the sidebar
+                # Pass the flags for advanced dynamics
+                fitness, component_scores = evaluate_fitness(individual, current_task, gen, active_fitness_weights, enable_epigenetics, enable_baldwin, epistatic_linkage_k, st.session_state.parasite_profile if enable_red_queen else None)
+                individual.fitness = fitness
+                individual.generation = gen
+                individual.age += 1
+                all_scores.append(component_scores)
+            
+            # Record detailed history
+            for individual, scores in zip(population, all_scores):
+                st.session_state.history.append({
+                    'generation': gen,
+                    'form': f'Form {individual.form_id}',
+                    'form_id': individual.form_id,
+                    'fitness': individual.fitness,
+                    'accuracy': scores['task_accuracy'],
+                    'efficiency': scores['efficiency'],
+                    'robustness': scores['robustness'],
+                    'generalization': scores['generalization'],
+                    'total_params': sum(m.size for m in individual.modules),
+                    'num_connections': len(individual.connections),
+                    'complexity': individual.complexity,
+                    'lineage_id': individual.lineage_id,
+                    'parent_ids': individual.parent_ids
+                })
+            
+            # Compute evolutionary metrics
+            fitness_array = np.array([ind.fitness for ind in population])
+            diversity = EvolutionaryTheory.genetic_diversity(population)
+            fisher_info = EvolutionaryTheory.fisher_information(population, fitness_array)
+
+            # --- Update stagnation counters ---
+            current_gen_best_fitness = fitness_array.max()
+            if current_gen_best_fitness > best_fitness_overall + 1e-6: # Use tolerance for float comparison
+                best_fitness_overall = current_gen_best_fitness
+                early_stop_counter = 0
+            else:
+                early_stop_counter += 1
+
+            # Display real-time metrics
+            with metrics_container.container():
+                col1, col2, col3, col4, col5 = st.columns(5)
+                col1.metric("Best Fitness", f"{fitness_array.max():.4f}")
+                col2.metric("Mean Fitness", f"{fitness_array.mean():.4f}")
+                col3.metric("Diversity (H)", f"{diversity:.3f}")
+                col4.metric("Mutation Rate (μ)", f"{current_mutation_rate:.3f}")
+                # Placeholder for species count, will be updated below
+                if enable_red_queen:
+                    target_act = st.session_state.parasite_profile.get('target_activation', 'N/A')
+                    parasite_display.info(f"**Red Queen Active:** Parasite targeting `{target_act}` activation function.")
+                else:
+                    parasite_display.empty()
+                species_metric = col5.metric("Species Count", "N/A")
+
+            st.session_state.evolutionary_metrics.append({
+                'generation': gen,
+                'diversity': diversity,
+                'fisher_info': fisher_info,
+                'best_fitness': fitness_array.max(),
+                'mean_fitness': fitness_array.mean(),
+                'mutation_rate': current_mutation_rate,
+                'stagnation_counter': stagnation_counter
+            })
+            
+            # Selection
+            if enable_speciation:
+                species = []
+                for ind in population:
+                    found_species = False
+                    for s in species:
+                        representative = s['representative']
+                        dist = genomic_distance(ind, representative)
+                        if dist < compatibility_threshold:
+                            s['members'].append(ind)
+                            found_species = True
+                            break
+                    if not found_species:
+                        species.append({'representative': ind, 'members': [ind]})
+                
+                species_metric.metric("Species Count", f"{len(species)}")
+                
+                # Apply fitness sharing
+                # Also calculate novelty if diversity pressure is on
+                for s in species:
+                    species_size = len(s['members'])
+                    if species_size > 0:
+                        for member in s['members']:
+                            member.adjusted_fitness = member.fitness / (species_size ** niche_competition_factor)
+                
+                if enable_diversity_pressure:
+                    # Calculate novelty for each individual across the whole population
+                    for ind in population:
+                        distances = [genomic_distance(ind, other) for other in population if ind.lineage_id != other.lineage_id]
+                        distances = [d for d in distances if d != float('inf')]
+                        if distances:
+                            k = min(10, len(distances))
+                            distances.sort()
+                            ind.novelty_score = np.mean(distances[:k])
+                        else:
+                            ind.novelty_score = 0.0
+                    
+                    max_novelty = max((ind.novelty_score for ind in population), default=1.0)
+                    if max_novelty > 0:
+                        for ind in population:
+                            ind.selection_score = ind.adjusted_fitness + diversity_weight * (ind.novelty_score / max_novelty)
+                    else:
+                        for ind in population:
+                            ind.selection_score = ind.adjusted_fitness
+                    
+                    selection_key = lambda x: x.selection_score
+                else:
+                    selection_key = lambda x: x.adjusted_fitness
+
+            else:
+                species_metric.metric("Species Count", f"{len(set(ind.form_id for ind in population))}")
+                if enable_diversity_pressure:
+                    for ind in population:
+                        distances = [genomic_distance(ind, other) for other in population if ind.lineage_id != other.lineage_id]
+                        distances = [d for d in distances if d != float('inf')]
+                        if distances:
+                            k = min(10, len(distances))
+                            distances.sort()
+                            ind.novelty_score = np.mean(distances[:k])
+                        else:
+                            ind.novelty_score = 0.0
+                    max_novelty = max((ind.novelty_score for ind in population), default=1.0)
+                    for ind in population:
+                        ind.selection_score = ind.fitness + diversity_weight * (ind.novelty_score / (max_novelty + 1e-9))
+                    selection_key = lambda x: x.selection_score
+                else:
+                    selection_key = lambda x: x.fitness
+
+            population.sort(key=selection_key, reverse=True)
+
+            num_survivors = max(2, int(len(population) * selection_pressure))
+            survivors = population[:num_survivors]
+            
+            # Calculate selection differential
+            selected_idx = np.arange(num_survivors)
+            sel_diff = EvolutionaryTheory.selection_differential(fitness_array, selected_idx)
+
+            # Red Queen Parasite Evolution
+            if enable_red_queen and survivors:
+                trait_counts = Counter()
+                for ind in survivors:
+                    for module in ind.modules:
+                        trait_counts[module.activation] += 1
+                if trait_counts:
+                    st.session_state.parasite_profile['target_activation'] = trait_counts.most_common(1)[0][0]
+            
+            # Reproduction
+            offspring = []
+            while len(offspring) < len(population) - len(survivors):
+                if random.random() < reintroduction_rate and st.session_state.gene_archive:
+                    # Reintroduce a "fossil" from the infinite gene pool
+                    child = random.choice(st.session_state.gene_archive).copy()
+                    child = mutate(child, current_mutation_rate * 1.5, innovation_rate * 1.5) # Mutate it heavily to adapt it
+                    child.generation = gen + 1
+                    offspring.append(child)
+                else:
+                    # --- Create one viable child via normal reproduction, with retries ---
+                    max_attempts = 20
+                    for _ in range(max_attempts):
+                        # Tournament selection using the appropriate fitness key
+                        parent1 = max(random.sample(survivors, min(3, len(survivors))), key=selection_key)
+                        
+                        if random.random() < crossover_rate:
+                            if enable_speciation and random.random() < gene_flow_rate and len(survivors) > 1:
+                                # Gene Flow: select any other survivor, ignoring species
+                                parent2_candidates = [s for s in survivors if s.lineage_id != parent1.lineage_id]
+                                parent2 = random.choice(parent2_candidates) if parent2_candidates else parent1
+                            elif len(survivors) > 1:
+                                # Normal Crossover: select compatible parent
+                                compatible = [s for s in survivors if s.form_id == parent1.form_id and s.lineage_id != parent1.lineage_id]
+                                parent2 = max(random.sample(compatible, min(2, len(compatible))), key=selection_key) if compatible else parent1 # type: ignore
+                            else:
+                                parent2 = parent1
+                            child = crossover(parent1, parent2, crossover_rate)
+                        else:
+                            child = parent1.copy()
+                        
+                        # Mutation and other operators
+                        child = mutate(child, current_mutation_rate, innovation_rate)
+                        if enable_endosymbiosis and random.random() < endosymbiosis_rate and survivors:
+                            child = apply_endosymbiosis(child, survivors)
+                        
+                        # Viability Selection: Ensure the child is a functional network
+                        if is_viable(child):
+                            child.generation = gen + 1
+                            offspring.append(child)
+                            st.session_state.gene_archive.append(child.copy()) # Add new viable child to archive
+                            # Prune archive if it exceeds max size to manage memory
+                            max_size = st.session_state.settings.get('max_archive_size', 10000)
+                            if len(st.session_state.gene_archive) > max_size:
+                                st.session_state.gene_archive = random.sample(st.session_state.gene_archive, max_size)
+                            break # Found a viable child, move to next offspring
+                    else: # for-else: runs if the loop finished without break
+                        # Fallback if no viable child was found after many attempts
+                        parent1 = max(random.sample(survivors, min(3, len(survivors))), key=selection_key)
+                        child = mutate(parent1.copy(), current_mutation_rate, innovation_rate)
+                        child.generation = gen + 1
+                        offspring.append(child)
+            
+            # Clean up temporary attribute
+            if enable_speciation:
+                for ind in population: # Clean up all temporary scores
+                    for attr in ['adjusted_fitness', 'novelty_score', 'selection_score']: # type: ignore
+                        if hasattr(ind, attr): delattr(ind, attr)
+
+            # Update mutation rate for next generation
+            if mutation_schedule == 'Linear Decay':
+                current_mutation_rate = max(0.01, mutation_rate * (1.0 - ((gen + 1) / num_generations)))
+            elif mutation_schedule == 'Adaptive':
+                current_best_fitness = current_gen_best_fitness # Use already computed value
+                if current_best_fitness > last_best_fitness:
+                    stagnation_counter = 0
+                    current_mutation_rate = max(0.05, current_mutation_rate * 0.95) # Anneal
+                else:
+                    stagnation_counter += 1
+                
+                if stagnation_counter > 3: # If stagnated for >3 generations
+                    current_mutation_rate = min(0.8, current_mutation_rate * (1 + adaptive_mutation_strength)) # Spike
+                
+                last_best_fitness = current_best_fitness
+            
+            # --- Early Stopping Check ---
+            if enable_early_stopping and early_stop_counter > early_stopping_patience:
+                st.success(f"**EARLY STOPPING TRIGGERED:** Best fitness has not improved for {early_stopping_patience} generations.")
+                st.toast("Evolution stopped early due to stagnation.", icon="🛑")
+                break # Exit the evolution loop
+
+            population = survivors + offspring
+            
+            # --- Checkpointing ---
+            if checkpoint_frequency > 0 and (gen + 1) % checkpoint_frequency == 0 and (gen + 1) < num_generations:
+                serializable_population = [genotype_to_dict(p) for p in population]
+                results_to_save = {
+                    'history': st.session_state.history,
+                    'evolutionary_metrics': st.session_state.evolutionary_metrics,
+                    'current_population': serializable_population
+                }
+                if results_table.get(doc_id=1):
+                    results_table.update(results_to_save, doc_ids=[1])
+                else:
+                    results_table.insert(results_to_save)
+                st.toast(f"Checkpoint saved at generation {gen + 1}", icon="💾")
+
             # Update progress
             progress_container.progress((gen + 1) / num_generations)
         
@@ -3274,7 +3677,7 @@ def main():
         population.sort(key=lambda x: x.fitness, reverse=True)
         
         # Show top 3
-        for i, individual in enumerate(population[:3]):
+        for i, individual in enumerate(population[:analysis_top_n]):
             expander_title = f"**Rank {i+1}:** Form `{individual.form_id}` | Lineage `{individual.lineage_id}` | Fitness: `{individual.fitness:.4f}`"
             with st.expander(expander_title, expanded=(i==0)):
                 
