@@ -2035,6 +2035,10 @@ def main():
             'compatibility_threshold': 7.0,
             'num_generations': 100,
             'complexity_level': 'medium',
+            'experiment_name': 'Optimal Default Run',
+            'random_seed': 42,
+            'enable_early_stopping': True,
+            'early_stopping_patience': 25,
             'aic_pressure': 0.0,
             'fep_bias': 0.0,
             'criticality_tuning': 0.5,
@@ -2119,7 +2123,7 @@ def main():
         index=task_options.index(default_task) if default_task in task_options else 0,
         help="Environmental pressure determines which architectures survive",
         key="task_type_selectbox"
-    )
+    )   
     
     with st.sidebar.expander("Dynamic Environment Settings"):
         dynamic_environment = st.checkbox("Enable Dynamic Environment", value=s.get('dynamic_environment', True), help="If enabled, the task will change periodically.", key="dynamic_env_checkbox")
@@ -2733,6 +2737,13 @@ def main():
         )
 
     st.sidebar.markdown("### Experiment Settings")
+    experiment_name = st.sidebar.text_input(
+        "Experiment Name",
+        value=s.get('experiment_name', 'Default Run'),
+        help="A name for this experiment run. Saved with the configuration and results.",
+        key="experiment_name_input"
+    )
+
     num_generations = st.sidebar.slider(
         "Generations",
         min_value=10, max_value=1000, value=s.get('num_generations', 100),
@@ -2751,6 +2762,27 @@ def main():
         options=complexity_options,
         value=s.get('complexity_level', 'medium'),
         key="complexity_level_select_slider"
+    )
+
+    st.sidebar.markdown("###### Advanced Controls")
+    random_seed = st.sidebar.number_input(
+        "Random Seed",
+        min_value=-1, value=s.get('random_seed', 42), step=1,
+        help="Set a specific seed for reproducibility. Use -1 for a random seed on each run.",
+        key="random_seed_input"
+    )
+    enable_early_stopping = st.sidebar.checkbox(
+        "Enable Early Stopping",
+        value=s.get('enable_early_stopping', True),
+        help="Stop the evolution if the best fitness does not improve for a set number of generations.",
+        key="enable_early_stopping_checkbox"
+    )
+    early_stopping_patience = st.sidebar.slider(
+        "Early Stopping Patience",
+        min_value=5, max_value=100, value=s.get('early_stopping_patience', 25),
+        disabled=not enable_early_stopping,
+        help="Number of generations to wait for improvement before stopping.",
+        key="early_stopping_patience_slider"
     )
     
     # --- Collect and save current settings ---
@@ -2790,6 +2822,10 @@ def main():
         'compatibility_threshold': compatibility_threshold,
         'num_generations': num_generations,
         'complexity_level': complexity_level,
+        'experiment_name': experiment_name,
+        'random_seed': random_seed,
+        'enable_early_stopping': enable_early_stopping,
+        'early_stopping_patience': early_stopping_patience,
         'aic_pressure': aic_pressure,
         'fep_bias': fep_bias,
         'criticality_tuning': criticality_tuning,
@@ -2862,6 +2898,14 @@ def main():
         st.session_state.evolutionary_metrics = [] # type: ignore
         st.session_state.gene_archive = [] # Initialize the infinite gene pool
         
+        # --- Seeding for reproducibility ---
+        if random_seed != -1:
+            random.seed(random_seed)
+            np.random.seed(random_seed)
+            st.toast(f"Using fixed random seed: {random_seed}", icon="🎲")
+        else:
+            st.toast("Using random seed.", icon="🎲")
+        
         # Initialize population
         population = []
         for form_id in range(1, num_forms + 1):
@@ -2873,7 +2917,9 @@ def main():
         
         # For adaptive mutation
         last_best_fitness = -1
+        best_fitness_overall = -1
         stagnation_counter = 0
+        early_stop_counter = 0
         current_mutation_rate = mutation_rate
         
         # For dynamic environment
@@ -2971,6 +3017,14 @@ def main():
             fitness_array = np.array([ind.fitness for ind in population])
             diversity = EvolutionaryTheory.genetic_diversity(population)
             fisher_info = EvolutionaryTheory.fisher_information(population, fitness_array)
+
+            # --- Update stagnation counters ---
+            current_gen_best_fitness = fitness_array.max()
+            if current_gen_best_fitness > best_fitness_overall + 1e-6: # Use tolerance for float comparison
+                best_fitness_overall = current_gen_best_fitness
+                early_stop_counter = 0
+            else:
+                early_stop_counter += 1
 
             # Display real-time metrics
             with metrics_container.container():
@@ -3142,9 +3196,9 @@ def main():
 
             # Update mutation rate for next generation
             if mutation_schedule == 'Linear Decay':
-                current_mutation_rate = mutation_rate * (1.0 - ((gen + 1) / num_generations))
+                current_mutation_rate = max(0.01, mutation_rate * (1.0 - ((gen + 1) / num_generations)))
             elif mutation_schedule == 'Adaptive':
-                current_best_fitness = fitness_array.max()
+                current_best_fitness = current_gen_best_fitness # Use already computed value
                 if current_best_fitness > last_best_fitness:
                     stagnation_counter = 0
                     current_mutation_rate = max(0.05, current_mutation_rate * 0.95) # Anneal
@@ -3155,6 +3209,12 @@ def main():
                     current_mutation_rate = min(0.8, current_mutation_rate * (1 + adaptive_mutation_strength)) # Spike
                 
                 last_best_fitness = current_best_fitness
+            
+            # --- Early Stopping Check ---
+            if enable_early_stopping and early_stop_counter > early_stopping_patience:
+                st.success(f"**EARLY STOPPING TRIGGERED:** Best fitness has not improved for {early_stopping_patience} generations.")
+                st.toast("Evolution stopped early due to stagnation.", icon="🛑")
+                break # Exit the evolution loop
 
             population = survivors + offspring
             
