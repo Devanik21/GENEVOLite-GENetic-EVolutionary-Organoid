@@ -2085,6 +2085,9 @@ def main():
             'polyploidy_event_prob': 0.0,
             'telomere_shortening_rate': 0.0,
             'wolbachia_infection_effect': 0.0,
+            'baldwinian_assimilation_rate': 0.0,
+            'autocatalytic_set_emergence': 0.0,
+            'majorana_fermion_pairing_bonus': 0.0,
             'deep_physics_enabled': False,
         }
         st.session_state.settings = optimal_defaults
@@ -2309,6 +2312,12 @@ def main():
         st.markdown("These features add deep biological complexity. You can disable them for a more classical evolutionary run.")
         enable_development = st.checkbox("Enable Developmental Program", value=s.get('enable_development', True), help="**Simulates ontogeny (growth from embryo to adult).** Allows genotypes to execute a 'developmental program' during their lifetime, such as pruning weak connections or growing modules. This separates the genotype from the final phenotype.", key="enable_development_checkbox")
         enable_baldwin = st.checkbox("Enable Baldwin Effect", value=s.get('enable_baldwin', True), help="**Models how learning shapes evolution.** An individual's `plasticity` allows it to 'learn' (improve its fitness) during its lifetime. This creates a selective pressure for architectures that are not just fit, but also good at learning (phenotypic plasticity).", key="enable_baldwin_checkbox")
+        baldwinian_assimilation_rate = st.slider(
+            "Baldwinian Assimilation Rate", 0.0, 0.1, s.get('baldwinian_assimilation_rate', 0.0), 0.001,
+            help="**The final step of learning becoming instinct.** The probability that a trait acquired via phenotypic plasticity (Baldwin Effect) becomes genetically fixed in the next generation. High rates rapidly convert learned behaviors into innate abilities.",
+            key="baldwinian_assimilation_rate_slider",
+            disabled=not enable_baldwin
+        )
         enable_epigenetics = st.checkbox("Enable Epigenetic Inheritance", value=s.get('enable_epigenetics', True), help="**Models Lamarckian-like inheritance.** Individuals pass down partially heritable 'aptitude' markers based on their life experience, allowing for very fast, non-genetic adaptation across a few generations.", key="enable_epigenetics_checkbox")
         enable_endosymbiosis = st.checkbox("Enable Endosymbiosis", value=s.get('enable_endosymbiosis', True), help="**Simulates Major Evolutionary Transitions.** A rare event where an architecture acquires a pre-evolved, successful module from another individual, simulating horizontal gene transfer and allowing for massive, instantaneous leaps in complexity.", key="enable_endosymbiosis_checkbox")
         
@@ -2574,6 +2583,12 @@ def main():
             key="erasure_cost_scaling_slider",
             disabled=not deep_physics_enabled
         )
+        majorana_fermion_pairing_bonus = st.slider(
+            "Majorana Fermion Pairing Bonus", 0.0, 1.0, s.get('majorana_fermion_pairing_bonus', 0.0), 0.05,
+            help="A highly speculative bonus for architectures exhibiting symmetric, self-dual information pathways, analogous to Majorana fermion pairing in quantum physics. Rewards deep structural symmetries.",
+            key="majorana_fermion_pairing_bonus_slider",
+            disabled=not deep_physics_enabled
+        )
         st.markdown("###### Developmental & Morphogenetic")
         turing_pattern_wavelength = st.slider(
             "Turing Pattern Wavelength", 0.0, 1.0, s.get('turing_pattern_wavelength', 0.0), 0.05,
@@ -2679,6 +2694,12 @@ def main():
             key="synchronization_propensity_slider",
             disabled=not deep_physics_enabled
         )
+        autocatalytic_set_emergence = st.slider(
+            "Autocatalytic Set Emergence", 0.0, 1.0, s.get('autocatalytic_set_emergence', 0.0), 0.05,
+            help="A fitness bonus for the emergence of 'autocatalytic sets' - tightly-coupled subgraphs where modules mutually support each other's existence, promoting complex, integrated subsystems.",
+            key="autocatalytic_set_emergence_slider",
+            disabled=not deep_physics_enabled
+        )
         st.markdown("###### Advanced Genetic Operators")
         transposon_activity_rate = st.slider(
             "Transposon Activity Rate", 0.0, 1.0, s.get('transposon_activity_rate', 0.0), 0.05,
@@ -2748,6 +2769,7 @@ def main():
         'innovation_rate': innovation_rate,
         'enable_development': enable_development,
         'enable_baldwin': enable_baldwin,
+        'baldwinian_assimilation_rate': baldwinian_assimilation_rate,
         'enable_epigenetics': enable_epigenetics,
         'endosymbiosis_rate': endosymbiosis_rate,
         'epistatic_linkage_k': epistatic_linkage_k,
@@ -2792,6 +2814,7 @@ def main():
         'kolmogorov_structure_function_slope': kolmogorov_structure_function_slope,
         'bennett_depth_premium': bennett_depth_premium,
         'decoherence_resistance_factor': decoherence_resistance_factor,
+        'majorana_fermion_pairing_bonus': majorana_fermion_pairing_bonus,
         'jarzynski_equality_adherence': jarzynski_equality_adherence,
         'non_equilibrium_steady_state_drive': non_equilibrium_steady_state_drive,
         'dissipation_cost_function': dissipation_cost_function,
@@ -2813,6 +2836,7 @@ def main():
         'frustration_index_minimization': frustration_index_minimization,
         'chimera_state_inducement': chimera_state_inducement,
         'network_motifs_overrepresentation': network_motifs_overrepresentation,
+        'autocatalytic_set_emergence': autocatalytic_set_emergence,
         'synchronization_propensity': synchronization_propensity,
         'transposon_activity_rate': transposon_activity_rate,
         'intron_splicing_variability': intron_splicing_variability,
