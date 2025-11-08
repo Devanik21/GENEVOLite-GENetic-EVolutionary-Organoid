@@ -2149,11 +2149,11 @@ def main():
     st.sidebar.header("🎛️ Evolution Configuration")
     
     if st.sidebar.button("⚙️ Reset to Optimal Defaults", width='stretch', help="Resets all parameters to a configuration optimized for robust and high-performance evolution.", key="reset_defaults_button"):
-        # This configuration is designed for stability and achieving high accuracy.
+        # This configuration is designed for stability and achieving high accuracy
         optimal_defaults = {
             'task_type': 'Abstract Reasoning (ARC-AGI-2)',
             'dynamic_environment': False,
-            'env_change_frequency': 25,
+            'env_change_frequency': 25, # Added key
             'num_forms': 5,
             'population_per_form': 20,
             'w_accuracy': 0.6,
@@ -2163,12 +2163,12 @@ def main():
             'mutation_rate': 0.2,
             'crossover_rate': 0.7,
             'innovation_rate': 0.05,
-            'enable_development': True,
-            'enable_baldwin': True,
-            'enable_epigenetics': True,
+            'enable_development': True, # Added key
+            'enable_baldwin': True, # Added key
+            'enable_epigenetics': True, # Added key
             'endosymbiosis_rate': 0.005,
             'epistatic_linkage_k': 2,
-            'gene_flow_rate': 0.01,
+            'gene_flow_rate': 0.01, # Added key
             'niche_competition_factor': 1.5,
             'reintroduction_rate': 0.05,
             'max_archive_size': 100000,
@@ -2182,7 +2182,7 @@ def main():
             'enable_diversity_pressure': True,
             'diversity_weight': 0.8,
             'enable_speciation': True,
-            'compatibility_threshold': 7.0,
+            'compatibility_threshold': 7.0, # Added key
             'num_generations': 100,
             'complexity_level': 'medium',
             'aic_pressure': 0.0,
@@ -2191,12 +2191,12 @@ def main():
             'landauer_adherence': 0.0,
             'quantum_tunneling': 0.0,
             'canalization_strength': 1.0,
-            'morphogenetic_gradient': 0.0,
+            'morphogenetic_gradient': 0.0, # Added key
             'grn_plasticity': 0.0,
             'somatic_hypermutation': 0.0,
             'hgt_mobility': 0.0,
             'symbiogenesis_threshold': 0.95,
-            'resource_scarcity': 1.0,
+            'resource_scarcity': 1.0, # Added key
             'topological_entropy_decay': 0.05,
             'semantic_threshold': 0.0,
             'computational_temp': 1.0,
@@ -2211,7 +2211,7 @@ def main():
             'jarzynski_equality_adherence': 0.0,
             'non_equilibrium_steady_state_drive': 0.0,
             'dissipation_cost_function': 0.0,
-            'many_worlds_branching_factor': 0.0,
+            'many_worlds_branching_factor': 0.0, # Added key
             'erasure_cost_scaling': 0.0,
             'turing_pattern_wavelength': 0.0,
             'homeobox_gene_expression_level': 0.0,
@@ -2219,12 +2219,12 @@ def main():
             'allosteric_regulation_factor': 0.0,
             'phenotypic_plasticity_cost': 0.0,
             'developmental_noise_injection': 0.0,
-            'gastrulation_event_trigger': 0.0,
+            'gastrulation_event_trigger': 0.0, # Added key
             'symbiotic_dependency_factor': 0.0,
             'mimicry_selection_pressure': 0.0,
             'character_displacement_force': 0.0,
             'trophic_level_energy_transfer': 0.0,
-            'invasive_species_introduction_prob': 0.0,
+            'invasive_species_introduction_prob': 0.0, # Added key
             'lyapunov_exponent_target': 0.0,
             'frustration_index_minimization': 0.0,
             'chimera_state_inducement': 0.0,
@@ -2235,7 +2235,7 @@ def main():
             'polyploidy_event_prob': 0.0,
             'telomere_shortening_rate': 0.0,
             'wolbachia_infection_effect': 0.0,
-            'baldwinian_assimilation_rate': 0.0,
+            'baldwinian_assimilation_rate': 0.0, # Added key
             'autocatalytic_set_emergence': 0.0,
             'majorana_fermion_pairing_bonus': 0.0,
             'deep_physics_enabled': False,
@@ -2272,7 +2272,7 @@ def main():
     )
     
     with st.sidebar.expander("Dynamic Environment Settings"):
-        dynamic_environment = st.checkbox("Enable Dynamic Environment", value=s.get('dynamic_environment', True), help="If enabled, the task will change periodically.", key="dynamic_env_checkbox")
+        dynamic_environment = st.checkbox("Enable Dynamic Environment", value=s.get('dynamic_environment', False), help="If enabled, the task will change periodically.", key="dynamic_env_checkbox")
         env_change_frequency = st.slider(
             "Change Frequency (Generations)",
             min_value=5, max_value=100, value=s.get('env_change_frequency', 25),
@@ -2442,7 +2442,7 @@ def main():
 
     with st.sidebar.expander("🌋 Ecosystem Shocks & Dynamics", expanded=False):
         st.markdown("Introduce high-level ecosystem pressures.")
-        enable_cataclysms = st.checkbox("Enable Cataclysms", value=s.get('enable_cataclysms', True), help="**Simulates mass extinctions.** Enable rare, random events like asteroid impacts (population crashes) or environmental collapses (fitness function shifts). Tests ecosystem resilience.", key="enable_cataclysms_checkbox")
+        enable_cataclysms = st.checkbox("Enable Cataclysms", value=s.get('enable_cataclysms', False), help="**Simulates mass extinctions.** Enable rare, random events like asteroid impacts (population crashes) or environmental collapses (fitness function shifts). Tests ecosystem resilience.", key="enable_cataclysms_checkbox")
         cataclysm_probability = st.slider(
             "Cataclysm Probability", 0.0, 0.5, s.get('cataclysm_probability', 0.01), 0.005,
             help="""
@@ -2462,14 +2462,14 @@ def main():
         st.markdown("These features add deep biological complexity. You can disable them for a more classical evolutionary run.")
         enable_development = st.checkbox("Enable Developmental Program", value=s.get('enable_development', True), help="**Simulates ontogeny (growth from embryo to adult).** Allows genotypes to execute a 'developmental program' during their lifetime, such as pruning weak connections or growing modules. This separates the genotype from the final phenotype.", key="enable_development_checkbox")
         enable_baldwin = st.checkbox("Enable Baldwin Effect", value=s.get('enable_baldwin', True), help="**Models how learning shapes evolution.** An individual's `plasticity` allows it to 'learn' (improve its fitness) during its lifetime. This creates a selective pressure for architectures that are not just fit, but also good at learning (phenotypic plasticity).", key="enable_baldwin_checkbox")
+        enable_epigenetics = st.checkbox("Enable Epigenetic Inheritance", value=s.get('enable_epigenetics', True), help="**Models Lamarckian-like inheritance.** Individuals pass down partially heritable 'aptitude' markers based on their life experience, allowing for very fast, non-genetic adaptation across a few generations.", key="enable_epigenetics_checkbox")
+        enable_endosymbiosis = st.checkbox("Enable Endosymbiosis", value=s.get('enable_endosymbiosis', True), help="**Simulates Major Evolutionary Transitions.** A rare event where an architecture acquires a pre-evolved, successful module from another individual, simulating horizontal gene transfer and allowing for massive, instantaneous leaps in complexity.", key="enable_endosymbiosis_checkbox")
         baldwinian_assimilation_rate = st.slider(
             "Baldwinian Assimilation Rate", 0.0, 0.1, s.get('baldwinian_assimilation_rate', 0.0), 0.001,
             help="**The final step of learning becoming instinct.** The probability that a trait acquired via phenotypic plasticity (Baldwin Effect) becomes genetically fixed in the next generation. High rates rapidly convert learned behaviors into innate abilities.",
             key="baldwinian_assimilation_rate_slider",
             disabled=not enable_baldwin
         )
-        enable_epigenetics = st.checkbox("Enable Epigenetic Inheritance", value=s.get('enable_epigenetics', True), help="**Models Lamarckian-like inheritance.** Individuals pass down partially heritable 'aptitude' markers based on their life experience, allowing for very fast, non-genetic adaptation across a few generations.", key="enable_epigenetics_checkbox")
-        enable_endosymbiosis = st.checkbox("Enable Endosymbiosis", value=s.get('enable_endosymbiosis', True), help="**Simulates Major Evolutionary Transitions.** A rare event where an architecture acquires a pre-evolved, successful module from another individual, simulating horizontal gene transfer and allowing for massive, instantaneous leaps in complexity.", key="enable_endosymbiosis_checkbox")
         
         endosymbiosis_rate = st.slider(
             "Endosymbiosis Rate",
@@ -2545,7 +2545,7 @@ def main():
             key="compatibility_threshold_slider"
         )
         st.info("Speciation uses a genomic distance metric based on form, module/connection differences, and parameter differences.")
-
+    
     with st.sidebar.expander("♾️ Deep Evolutionary Physics & Information Dynamics", expanded=False):
         st.markdown("These parameters control the deep, underlying physics of the simulated universe, influencing information flow, developmental biology, and thermodynamic properties. **Warning:** These are highly experimental and can lead to unpredictable dynamics.")
         
@@ -2578,7 +2578,7 @@ def main():
             help="**Simulates a quantum mechanism for escaping local optima.** A non-zero value allows genotypes to 'tunnel' through fitness barriers to adjacent, but otherwise unreachable, points in the genotype space during selection.",
             key="quantum_tunneling_slider"
         )
-
+    
         st.markdown("---")
 
         canalization_strength = st.slider(
@@ -2586,7 +2586,7 @@ def main():
             help="**Models developmental robustness.** How strongly the developmental process (genotype-to-phenotype mapping) resists perturbations from mutations or environmental noise. High values lead to very stable phenotypes.",
             key="canalization_strength_slider"
         )
-
+    
         morphogenetic_gradient = st.slider(
             "Morphogenetic Field Gradient (∇Φ)", 0.0, 1.0, s.get('morphogenetic_gradient', 0.0), 0.05,
             help="**Controls spatial organization during development.** The strength of a simulated spatial chemical gradient that influences module placement, differentiation, and connectivity, creating body plans.",
@@ -2604,7 +2604,7 @@ def main():
             help="**Simulates lifetime adaptation, like the immune system.** A rate of mutation that occurs *within* an individual's lifetime on specific 'plastic' modules, allowing for rapid, targeted adaptation without changing the germline DNA.",
             key="somatic_hypermutation_slider"
         )
-
+    
         st.markdown("---")
 
         hgt_mobility = st.slider(
@@ -2612,7 +2612,7 @@ def main():
             help="**Models extreme horizontal gene transfer.** The probability that a successful genetic module can be transferred between *unrelated* species (different Forms), enabling massive, non-linear evolutionary leaps.",
             key="hgt_mobility_slider"
         )
-
+    
         symbiogenesis_threshold = st.slider(
             "Symbiogenesis Trigger (τ_sym)", 0.5, 1.0, s.get('symbiogenesis_threshold', 0.95), 0.01,
             help="**A fitness threshold for species fusion.** When two distinct species both cross this high fitness threshold, it dramatically increases the probability of a symbiogenesis (endosymbiosis) event between them.",
@@ -2624,7 +2624,7 @@ def main():
             help="**Simulates ecosystem-wide resource limits.** A global multiplier on the 'cost' of parameters and connections. High scarcity heavily penalizes large models, forcing the entire ecosystem towards efficiency.",
             key="resource_scarcity_slider"
         )
-
+    
         topological_entropy_decay = st.slider(
             "Topological Entropy Decay (λ_top)", 0.0, 0.5, s.get('topological_entropy_decay', 0.05), 0.01,
             help="**Controls diversity of network motifs.** The rate at which the diversity of local connection patterns is encouraged to decay. High decay forces the system to settle on a few proven motifs; low decay encourages exploration of new ones.",
@@ -2642,7 +2642,7 @@ def main():
             help="**Noise in the genotype-phenotype map.** Analogous to thermodynamic temperature, this controls the stochasticity of the developmental process. High temperature leads to more variable and noisy phenotypic expression for the same genotype.",
             key="computational_temp_slider"
         )
-
+    
         st.markdown("---")
         deep_physics_enabled = st.checkbox(
             "☢️ Enable All Experimental Parameters Below",
@@ -2652,7 +2652,7 @@ def main():
         )
         if deep_physics_enabled:
             st.warning("**Experimental Parameters Enabled!** The simulation will now incorporate highly complex and potentially unstable dynamics. Monitor results closely.")
-
+    
         st.markdown("###### Information & Complexity Theoretic")
         information_bottleneck_width = st.slider(
             "Information Bottleneck Width", 0.0, 1.0, s.get('information_bottleneck_width', 0.0), 0.05,
@@ -2696,6 +2696,12 @@ def main():
             key="bennett_depth_premium_slider",
             disabled=not deep_physics_enabled
         )
+        majorana_fermion_pairing_bonus = st.slider(
+            "Majorana Fermion Pairing Bonus", 0.0, 1.0, s.get('majorana_fermion_pairing_bonus', 0.0), 0.05,
+            help="A highly speculative bonus for architectures exhibiting symmetric, self-dual information pathways, analogous to Majorana fermion pairing in quantum physics. Rewards deep structural symmetries.",
+            key="majorana_fermion_pairing_bonus_slider",
+            disabled=not deep_physics_enabled
+        )
         st.markdown("###### Quantum & Thermodynamic")
         decoherence_resistance_factor = st.slider(
             "Decoherence Resistance Factor", 0.0, 1.0, s.get('decoherence_resistance_factor', 0.0), 0.05,
@@ -2731,12 +2737,6 @@ def main():
             "Erasure Cost Scaling", 0.0, 1.0, s.get('erasure_cost_scaling', 0.0), 0.05,
             help="How strongly the Landauer cost scales with the number of bit erasures.",
             key="erasure_cost_scaling_slider",
-            disabled=not deep_physics_enabled
-        )
-        majorana_fermion_pairing_bonus = st.slider(
-            "Majorana Fermion Pairing Bonus", 0.0, 1.0, s.get('majorana_fermion_pairing_bonus', 0.0), 0.05,
-            help="A highly speculative bonus for architectures exhibiting symmetric, self-dual information pathways, analogous to Majorana fermion pairing in quantum physics. Rewards deep structural symmetries.",
-            key="majorana_fermion_pairing_bonus_slider",
             disabled=not deep_physics_enabled
         )
         st.markdown("###### Developmental & Morphogenetic")
@@ -2919,10 +2919,10 @@ def main():
         'innovation_rate': innovation_rate,
         'enable_development': enable_development,
         'enable_baldwin': enable_baldwin,
-        'baldwinian_assimilation_rate': baldwinian_assimilation_rate,
         'enable_epigenetics': enable_epigenetics,
         'endosymbiosis_rate': endosymbiosis_rate,
         'epistatic_linkage_k': epistatic_linkage_k,
+        'baldwinian_assimilation_rate': baldwinian_assimilation_rate,
         'gene_flow_rate': gene_flow_rate,
         'niche_competition_factor': niche_competition_factor,
         'max_archive_size': max_archive_size,
@@ -2964,7 +2964,6 @@ def main():
         'kolmogorov_structure_function_slope': kolmogorov_structure_function_slope,
         'bennett_depth_premium': bennett_depth_premium,
         'decoherence_resistance_factor': decoherence_resistance_factor,
-        'majorana_fermion_pairing_bonus': majorana_fermion_pairing_bonus,
         'jarzynski_equality_adherence': jarzynski_equality_adherence,
         'non_equilibrium_steady_state_drive': non_equilibrium_steady_state_drive,
         'dissipation_cost_function': dissipation_cost_function,
@@ -2985,13 +2984,14 @@ def main():
         'lyapunov_exponent_target': lyapunov_exponent_target,
         'frustration_index_minimization': frustration_index_minimization,
         'chimera_state_inducement': chimera_state_inducement,
+        'majorana_fermion_pairing_bonus': majorana_fermion_pairing_bonus,
         'network_motifs_overrepresentation': network_motifs_overrepresentation,
-        'autocatalytic_set_emergence': autocatalytic_set_emergence,
         'synchronization_propensity': synchronization_propensity,
         'transposon_activity_rate': transposon_activity_rate,
         'intron_splicing_variability': intron_splicing_variability,
         'polyploidy_event_prob': polyploidy_event_prob,
         'telomere_shortening_rate': telomere_shortening_rate,
+        'autocatalytic_set_emergence': autocatalytic_set_emergence,
         'wolbachia_infection_effect': wolbachia_infection_effect,
     }
     
