@@ -2895,6 +2895,13 @@ def main():
         key="num_generations_slider"
     )
     
+    num_ranks_to_show = st.sidebar.number_input(
+        "Ranks to Display",
+        min_value=1, max_value=20, value=s.get('num_ranks_to_show', 3),
+        help="How many of the top-ranked architectures to display in the results section. High values may slow down the UI.",
+        key="num_ranks_to_show_input"
+    )
+    
     complexity_options = ['minimal', 'medium', 'high']
     complexity_level = st.sidebar.select_slider(
         "Initial Complexity",
@@ -2939,6 +2946,7 @@ def main():
         'diversity_weight': diversity_weight,
         'compatibility_threshold': compatibility_threshold,
         'num_generations': num_generations,
+        'num_ranks_to_show': num_ranks_to_show,
         'complexity_level': complexity_level,
         'aic_pressure': aic_pressure,
         'fep_bias': fep_bias,
@@ -3363,8 +3371,9 @@ def main():
         population = st.session_state.current_population
         population.sort(key=lambda x: x.fitness, reverse=True)
         
-        # Show top 3
-        for i, individual in enumerate(population[:3]):
+        # Show top N ranks based on user setting
+        num_ranks = st.session_state.settings.get('num_ranks_to_show', 3)
+        for i, individual in enumerate(population[:num_ranks]):
             expander_title = f"**Rank {i+1}:** Form `{individual.form_id}` | Lineage `{individual.lineage_id}` | Fitness: `{individual.fitness:.4f}`"
             with st.expander(expander_title, expanded=(i==0)):
                 
