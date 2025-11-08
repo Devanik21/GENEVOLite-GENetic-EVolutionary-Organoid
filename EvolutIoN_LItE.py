@@ -3236,7 +3236,13 @@ def main():
                             child = apply_endosymbiosis(child, survivors)
                         
                         # Viability Selection: Ensure the child is a functional network
-                        if is_viable(child):
+                        # Viability Selection: Ensure the child is a functional network
+                        
+                        # --- START OF FIX ---
+                        # Add a check to ensure 'child' is not None before checking viability
+                        if child is not None and is_viable(child):
+                        # --- END OF FIX ---
+                        
                             child.generation = gen + 1
                             offspring.append(child)
                             st.session_state.gene_archive.append(child.copy()) # Add new viable child to archive
@@ -3249,8 +3255,13 @@ def main():
                         # Fallback if no viable child was found after many attempts
                         parent1 = max(random.sample(survivors, min(3, len(survivors))), key=selection_key)
                         child = mutate(parent1.copy(), current_mutation_rate, innovation_rate)
-                        child.generation = gen + 1
-                        offspring.append(child)
+                        
+                        # --- START OF FIX (for Fallback) ---
+                        # Also add the None check here for safety, though it's less likely to fail
+                        if child is not None:
+                        # --- END OF FIX ---
+                            child.generation = gen + 1
+                            offspring.append(child)
             
             # Clean up temporary attribute
             if enable_speciation:
