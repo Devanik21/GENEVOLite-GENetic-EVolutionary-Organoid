@@ -652,6 +652,12 @@ def apply_endosymbiosis(recipient: Genotype, donors: List[Genotype]) -> Genotype
     A rare event where a recipient genotype acquires a module from a highly fit donor.
     This simulates horizontal gene transfer or endosymbiosis.
     """
+    # --- START OF FIX ---
+    # Add a check to see if the recipient itself is None, preventing the crash.
+    if recipient is None:
+        return recipient # Return None, as nothing can be done
+    # --- END OF FIX ---
+
     if not donors or not recipient.connections:
         return recipient
 
