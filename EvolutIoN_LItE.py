@@ -3200,14 +3200,21 @@ def main():
                     st.session_state.parasite_profile['target_activation'] = trait_counts.most_common(1)[0][0]
             
             # Reproduction
+            # Reproduction
             offspring = []
             while len(offspring) < len(population) - len(survivors):
                 if random.random() < reintroduction_rate and st.session_state.gene_archive:
                     # Reintroduce a "fossil" from the infinite gene pool
                     child = random.choice(st.session_state.gene_archive).copy()
                     child = mutate(child, current_mutation_rate * 1.5, innovation_rate * 1.5) # Mutate it heavily to adapt it
-                    child.generation = gen + 1
-                    offspring.append(child)
+                    
+                    # --- START OF FIX ---
+                    # Add a safety check to ensure mutate() did not return None
+                    if child is not None:
+                        child.generation = gen + 1
+                        offspring.append(child)
+                    # --- END OF FIX ---
+                    
                 else:
                     # --- Create one viable child via normal reproduction, with retries ---
                     max_attempts = 20
