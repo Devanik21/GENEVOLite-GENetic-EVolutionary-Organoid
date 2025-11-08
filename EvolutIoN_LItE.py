@@ -257,6 +257,12 @@ def is_viable(genotype: Genotype) -> bool:
     from an input node to an output node. This prevents non-functional
     architectures from entering the population.
     """
+    # --- START OF FIX ---
+    # Add a check to see if the genotype itself is None, preventing the crash.
+    if genotype is None:
+        return False
+    # --- END OF FIX ---
+    
     if not genotype.modules or not genotype.connections:
         return False
 
