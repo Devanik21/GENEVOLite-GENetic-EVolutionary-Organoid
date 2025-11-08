@@ -688,6 +688,7 @@ def mutate(genotype: Genotype, mutation_rate: float = 0.2, innovation_rate: floa
     
     mutated.complexity = mutated.compute_complexity()
     return mutated
+   
 
 def crossover(parent1: Genotype, parent2: Genotype, crossover_rate: float = 0.7) -> Genotype:
     """Advanced recombination with homologous alignment"""
